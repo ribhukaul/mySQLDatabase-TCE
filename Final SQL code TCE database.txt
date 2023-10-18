@@ -1,0 +1,106 @@
+-- -----------------------------------------------------
+-- Table `tce-database`.`user`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tce-database`.`user` (
+  `user_id` INT NOT NULL AUTO_INCREMENT,
+  `User_name` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(45) GENERATED ALWAYS AS () VIRTUAL,
+  `address` VARCHAR(150) NOT NULL,
+  `phone` INT NOT NULL,
+  PRIMARY KEY (`user_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `tce-database`.`products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tce-database`.`products` (
+  `product_id` INT NOT NULL AUTO_INCREMENT,
+  `product_name` VARCHAR(45) NOT NULL,
+  `price` DECIMAL(10,2) NOT NULL,
+  `quantity_available` INT NOT NULL,
+  PRIMARY KEY (`product_id`),
+  INDEX `price_idx` (`price` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+
+
+-- -----------------------------------------------------
+-- Table `tce-database`.`order_item`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tce-database`.`order_item` (
+  `order_item_id` INT NOT NULL AUTO_INCREMENT,
+  `order_id` INT NULL DEFAULT NULL,
+  `product_id` INT NULL DEFAULT NULL,
+  `quantity` INT NOT NULL,
+  `price` DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (`order_item_id`),
+  INDEX `order_id_idx` (`order_id` ASC) VISIBLE,
+  INDEX `product_id_idx` (`product_id` ASC) VISIBLE,
+  INDEX `price_idx` (`price` ASC) VISIBLE,
+  CONSTRAINT `order_id`
+    FOREIGN KEY (`order_id`)
+    REFERENCES `tce-database`.`order` (`order_id`),
+  CONSTRAINT `price`
+    FOREIGN KEY (`price`)
+    REFERENCES `tce-database`.`products` (`price`),
+  CONSTRAINT `product_id`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `tce-database`.`products` (`product_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `tce-database`.`order`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tce-database`.`order` (
+  `order_id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NULL DEFAULT NULL,
+  `order_date` DATE NOT NULL,
+  `total_amount` DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (`order_id`),
+  INDEX `user_id` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `order_ibfk_1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `tce-database`.`user` (`user_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+-- -----------------------------------------------------
+-- Table `tce-database`.`category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tce-database`.`category` (
+  `category_id` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`category_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `tce-database`.`product_category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tce-database`.`product_category` (
+  `product_id` INT NOT NULL,
+  `category_id` INT NOT NULL,
+  PRIMARY KEY (`product_id`, `category_id`),
+  INDEX `category_id` (`category_id` ASC) VISIBLE,
+  CONSTRAINT `product_category_ibfk_1`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `tce-database`.`products` (`product_id`),
+  CONSTRAINT `product_category_ibfk_2`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `tce-database`.`category` (`category_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
